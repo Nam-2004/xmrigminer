@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XMR Web Miner</title>
+    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-microchip"></i> XMR Web Miner</h1>
+            <p class="subtitle">Khai thác XMR trực tuyến với nhiều thuật toán</p>
+        </header>
+
+        <main>
+            <div class="card settings-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-cogs"></i> Cài đặt</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="wallet-address">Địa chỉ ví XMR:</label>
+                        <input type="text" id="wallet-address" placeholder="Nhập địa chỉ ví Monero của bạn">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mining-pool">Pool khai thác:</label>
+                            <select id="mining-pool">
+                                <option value="rx.unmineable.com:3333">rx.unmineable.com:3333</option>
+                                <option value="pool.supportxmr.com:3333">pool.supportxmr.com:3333</option>
+                                <option value="xmr.2miners.com:2222">xmr.2miners.com:2222</option>
+                                <option value="xmr.f2pool.com:13531">xmr.f2pool.com:13531</option>
+                                <option value="xmrpool.eu:3333">xmrpool.eu:3333</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="worker-name">Tên worker:</label>
+                            <input type="text" id="worker-name" placeholder="worker1" value="web-worker">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="algorithm">Thuật toán:</label>
+                            <select id="algorithm">
+                                <option value="rx/0">RandomX (rx/0) - Monero</option>
+                                <option value="rx/wow">RandomWow (rx/wow) - Wownero</option>
+                                <option value="rx/arq">RandomArq (rx/arq) - ArQmA</option>
+                                <option value="cn/r">CryptoNight-R (cn/r)</option>
+                                <option value="argon2/chukwa">Argon2/Chukwa - Turtlecoin</option>
+                                <option value="kawpow">KawPow - Ravencoin</option>
+                                <option value="ethash">Ethash</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="threads">Số luồng CPU:</label>
+                            <input type="number" id="threads" min="1" max="16" value="4">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="throttle">Mức sử dụng CPU:</label>
+                        <input type="range" id="throttle" min="1" max="100" value="70">
+                        <span id="throttle-value">70%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card status-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-chart-line"></i> Thống kê</h2>
+                </div>
+                <div class="card-body">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Trạng thái:</div>
+                            <div class="stat-value" id="mining-status">Dừng</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Hashrate:</div>
+                            <div class="stat-value" id="hashrate">0 H/s</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Shares đã chấp nhận:</div>
+                            <div class="stat-value" id="accepted-shares">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Shares bị từ chối:</div>
+                            <div class="stat-value" id="rejected-shares">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Kết nối:</div>
+                            <div class="stat-value" id="connection-status">Không kết nối</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Thời gian chạy:</div>
+                            <div class="stat-value" id="uptime">00:00:00</div>
+                        </div>
+                    </div>
+                    
+                    <div class="hashrate-chart-container">
+                        <canvas id="hashrate-chart"></canvas>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button id="start-button" class="btn primary-btn"><i class="fas fa-play"></i> Bắt đầu khai thác</button>
+                        <button id="stop-button" class="btn danger-btn" disabled><i class="fas fa-stop"></i> Dừng khai thác</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card log-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-terminal"></i> Nhật ký</h2>
+                    <button id="clear-log" class="btn small-btn">Xóa nhật ký</button>
+                </div>
+                <div class="card-body">
+                    <div id="mining-log" class="log-container"></div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2023 XMR Web Miner | <a href="https://github.com/xmrig/xmrig" target="_blank">Dựa trên XMRig</a></p>
+            <div class="disclaimer">
+                <strong>Lưu ý:</strong> Miner này sẽ sử dụng CPU của bạn để khai thác tiền điện tử. Vui lòng sử dụng có trách nhiệm.
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/algorithms.js"></script>
+    <script src="js/miner.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
