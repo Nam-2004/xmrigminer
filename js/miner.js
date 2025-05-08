@@ -1,3 +1,8 @@
+/**
+ * XMR Web Miner - miner.js
+ * Lớp WebMiner để quản lý tác vụ khai thác tiền điện tử trong trình duyệt
+ */
+
 class WebMiner {
     constructor() {
         this.miner = null;
@@ -19,6 +24,7 @@ class WebMiner {
         this.autoReconnect = true;
         this.lastShareTime = null;
         
+        // Kiểm tra hỗ trợ trình duyệt
         this.wasmSupported = checkWasmSupport();
         if (!this.wasmSupported) {
             this.logError("Trình duyệt của bạn không hỗ trợ WebAssembly, không thể khai thác");
@@ -30,6 +36,11 @@ class WebMiner {
         }
     }
 
+    /**
+     * Bắt đầu quá trình khai thác
+     * @param {Object} config - Cấu hình khai thác
+     * @returns {boolean} Kết quả thành công
+     */
     start(config) {
         if (!this.wasmSupported || !this.webWorkersSupported) {
             this.logError("Không thể khai thác: Trình duyệt không hỗ trợ công nghệ cần thiết");
@@ -83,6 +94,9 @@ class WebMiner {
         }
     }
 
+    /**
+     * Dừng quá trình khai thác
+     */
     stop() {
         if (!this.running) {
             return;
@@ -99,6 +113,10 @@ class WebMiner {
         this.logSuccess("Đã dừng khai thác");
     }
 
+    /**
+     * Lấy thống kê khai thác hiện tại
+     * @returns {Object} Đối tượng thống kê khai thác
+     */
     getStats() {
         const currentHashrate = this._calculateCurrentHashrate();
             
@@ -116,6 +134,11 @@ class WebMiner {
         };
     }
 
+    /**
+     * Ghi thông báo vào nhật ký
+     * @param {string} message - Thông báo để hiển thị
+     * @param {string} type - Loại thông báo (info, success, warning, error)
+     */
     log(message, type = "info") {
         const logContainer = document.getElementById("logs");
         const time = new Date().toTimeString().split(' ')[0];
@@ -131,28 +154,52 @@ class WebMiner {
         }
     }
 
+    /**
+     * Ghi thông báo thông tin vào nhật ký
+     * @param {string} message - Thông báo để hiển thị
+     */
     logInfo(message) {
         this.log(message, "info");
     }
 
+    /**
+     * Ghi thông báo thành công vào nhật ký
+     * @param {string} message - Thông báo để hiển thị
+     */
     logSuccess(message) {
         this.log(message, "success");
     }
 
+    /**
+     * Ghi thông báo cảnh báo vào nhật ký
+     * @param {string} message - Thông báo để hiển thị
+     */
     logWarning(message) {
         this.log(message, "warning");
     }
 
+    /**
+     * Ghi thông báo lỗi vào nhật ký
+     * @param {string} message - Thông báo để hiển thị
+     */
     logError(message) {
         this.log(message, "error");
     }
 
+    /**
+     * Xóa nhật ký
+     */
     clearLog() {
         const logContainer = document.getElementById("logs");
         logContainer.innerHTML = "";
         this.logInfo("Nhật ký đã được xóa");
     }
     
+    /**
+     * Cập nhật số lượng luồng khai thác trong khi đang chạy
+     * @param {number} newThreadCount - Số lượng luồng mới
+     * @returns {boolean} Kết quả thành công
+     */
     updateThreads(newThreadCount) {
         if (!this.running) {
             this.threadCount = newThreadCount;
@@ -176,6 +223,11 @@ class WebMiner {
         return true;
     }
     
+    /**
+     * Cập nhật mức throttle trong khi đang chạy
+     * @param {number} newThrottle - Mức throttle mới (0-100)
+     * @returns {boolean} Kết quả thành công
+     */
     updateThrottle(newThrottle) {
         if (newThrottle < 0 || newThrottle > 100) {
             this.logWarning("Mức sử dụng CPU phải từ 0-100%");
@@ -192,6 +244,11 @@ class WebMiner {
         return true;
     }
 
+    /**
+     * Lấy thời gian uptime được định dạng
+     * @returns {string} Thời gian uptime định dạng "HH:MM:SS"
+     * @private
+     */
     _getUptime() {
         if (!this.startTime || !this.running) {
             return "00:00:00";
@@ -211,6 +268,11 @@ class WebMiner {
         ].join(':');
     }
     
+    /**
+     * Tính toán hashrate hiện tại dựa trên các mẫu gần đây
+     * @returns {number} Hashrate hiện tại (H/s)
+     * @private
+     */
     _calculateCurrentHashrate() {
         if (this.hashrates.length === 0) return 0;
         
@@ -218,6 +280,11 @@ class WebMiner {
         return recentHashrates.reduce((a, b) => a + b, 0) / recentHashrates.length;
     }
     
+    /**
+     * Lấy dữ liệu hiệu suất cho từng luồng
+     * @returns {Array} Mảng các đối tượng dữ liệu luồng
+     * @private
+     */
     _getThreadData() {
         return this.threads.map((thread, index) => ({
             id: index,
@@ -227,6 +294,10 @@ class WebMiner {
         }));
     }
     
+    /**
+     * Khởi tạo các đối tượng luồng
+     * @private
+     */
     _initThreads() {
         this.threads = [];
         
@@ -241,12 +312,17 @@ class WebMiner {
         }
     }
     
+    /**
+     * Bắt đầu quá trình khai thác
+     * @private
+     */
     _startMining() {
         const algoConfig = getAlgorithmInfo(this.selectedAlgorithm);
         const optimizedConfig = getOptimizedConfig(this.selectedAlgorithm, this.threadCount, this.throttle);
         
         this.logInfo("Đang bắt đầu các luồng khai thác...");
         
+        // Trong môi trường demo này, chúng ta mô phỏng kết nối thành công sau 2 giây
         setTimeout(() => {
             this.connectionStatus = "Đã kết nối";
             this.logSuccess(`Kết nối thành công đến ${this.poolUrl}`);
@@ -254,14 +330,20 @@ class WebMiner {
             this._startHashrateSimulation();
         }, 2000);
         
+        // Cập nhật UI
         document.getElementById("mining-status").textContent = "Đang chạy";
         document.getElementById("status-light").className = "status-light active";
         document.getElementById("connection-status").textContent = "Đã kết nối";
     }
     
+    /**
+     * Dừng quá trình khai thác
+     * @private
+     */
     _stopMining() {
         clearInterval(this.hashrateInterval);
         
+        // Dừng tất cả các worker luồng
         this.threads.forEach(thread => {
             if (thread.worker) {
                 thread.worker.terminate();
@@ -269,11 +351,17 @@ class WebMiner {
             }
         });
         
+        // Cập nhật UI
         document.getElementById("mining-status").textContent = "Đã dừng";
         document.getElementById("status-light").className = "status-light inactive";
         document.getElementById("connection-status").textContent = "Không kết nối";
     }
     
+    /**
+     * Thêm các luồng mới vào miner đang chạy
+     * @param {number} count - Số lượng luồng cần thêm
+     * @private
+     */
     _addThreads(count) {
         const startIndex = this.threads.length;
         
@@ -292,12 +380,18 @@ class WebMiner {
         }
     }
     
+    /**
+     * Loại bỏ các luồng từ miner đang chạy
+     * @param {number} count - Số lượng luồng cần loại bỏ
+     * @private
+     */
     _removeThreads(count) {
         for (let i = 0; i < count; i++) {
             if (this.threads.length === 0) break;
             
             const thread = this.threads.pop();
             
+            // Dừng worker của luồng nếu có
             if (thread.worker) {
                 thread.worker.terminate();
             }
@@ -306,10 +400,20 @@ class WebMiner {
         }
     }
     
+    /**
+     * Áp dụng mức throttle mới cho các luồng
+     * @private
+     */
     _applyThrottle() {
         this.logInfo(`Áp dụng cường độ mới: ${this.throttle}%`);
+        // Trong phiên bản demo này, thay đổi throttle sẽ được thấy trong _startHashrateSimulation
     }
     
+    /**
+     * Xử lý một share mới
+     * @param {boolean} accepted - True nếu share được chấp nhận, False nếu bị từ chối
+     * @private
+     */
     _handleShare(accepted) {
         if (accepted) {
             this.acceptedShares++;
@@ -324,14 +428,21 @@ class WebMiner {
         document.getElementById("rejected-shares").textContent = this.rejectedShares;
     }
     
+    /**
+     * Xử lý lỗi từ pool khai thác
+     * @param {string} error - Thông báo lỗi
+     * @private
+     */
     _handlePoolError(error) {
         this.connectionStatus = "Lỗi kết nối";
         this.logError(`Lỗi pool: ${error}`);
         
+        // Thử kết nối lại nếu cần
         if (this.autoReconnect && this.reconnectAttempts < this.maxReconnectAttempts) {
             this.isReconnecting = true;
             this.reconnectAttempts++;
             
+            // Thời gian chờ tăng theo cấp số nhân (1s, 2s, 4s, 8s, ...)
             const delaySeconds = Math.min(30, Math.pow(2, this.reconnectAttempts));
             this.logWarning(`Thử kết nối lại sau ${delaySeconds} giây (lần ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
             
@@ -341,6 +452,7 @@ class WebMiner {
                     this.connectionStatus = "Đang kết nối lại...";
                     document.getElementById("connection-status").textContent = "Đang kết nối lại...";
                     
+                    // Mô phỏng kết nối lại thành công
                     setTimeout(() => {
                         this.connectionStatus = "Đã kết nối";
                         this.isReconnecting = false;
@@ -355,21 +467,30 @@ class WebMiner {
         }
     }
     
+    /**
+     * Bắt đầu mô phỏng hashrate
+     * Lưu ý: Trong triển khai thực tế, cái này sẽ được thay thế bằng dữ liệu thực từ công cụ khai thác
+     * @private
+     */
     _startHashrateSimulation() {
         const algorithm = getAlgorithmInfo(this.selectedAlgorithm);
-        const baseHashratePerThread = 25;
+        const baseHashratePerThread = 25; // H/s cơ bản cho mỗi luồng
         
         this.hashrateInterval = setInterval(() => {
             let totalHashrate = 0;
             
+            // Cập nhật dữ liệu cho mỗi luồng
             for (let i = 0; i < this.threadCount; i++) {
+                // Tạo dao động ngẫu nhiên cho hashrate của từng luồng
                 const threadFactor = 0.7 + (Math.random() * 0.6);
                 const threadIntensity = this.throttle / 100;
                 const threadHashrate = baseHashratePerThread * algorithm.hashrateFactor * threadFactor * threadIntensity;
                 
+                // Lưu vào đối tượng luồng
                 this.threads[i].hashrate = threadHashrate;
                 totalHashrate += threadHashrate;
                 
+                // Cập nhật UI cho luồng nếu các phần tử tồn tại
                 const threadElement = document.getElementById(`thread-hashrate-${i}`);
                 const threadUsage = document.getElementById(`thread-usage-${i}`);
                 
@@ -378,292 +499,42 @@ class WebMiner {
                 }
                 
                 if (threadUsage) {
+                    // Mô phỏng CPU usage (50-100% của throttle được đặt)
                     const usagePercent = Math.min(100, (50 + Math.random() * 50) * threadIntensity);
                     threadUsage.style.width = `${usagePercent}%`;
                 }
             }
             
+            // Thêm hashrate hiện tại vào lịch sử
             this.hashrates.push(totalHashrate);
             if (this.hashrates.length > 100) {
                 this.hashrates.shift();
             }
             
-            this.totalHashes += totalHashrate * 3;
+            // Cập nhật tổng hashes
+            this.totalHashes += totalHashrate * 3; // 3 giây từ lần cập nhật cuối
             
+            // Cập nhật UI
             document.getElementById("hashrate").textContent = `${totalHashrate.toFixed(2)} H/s`;
             document.getElementById("total-hashes").textContent = Math.floor(this.totalHashes).toLocaleString();
             document.getElementById("runtime").textContent = this._getUptime();
             
+            // Cập nhật biểu đồ nếu hàm cập nhật biểu đồ tồn tại
             if (window.updateHashrateChart) {
                 window.updateHashrateChart(totalHashrate);
             }
             
+            // Thỉnh thoảng mô phỏng tìm thấy share (5% cơ hội mỗi 3 giây)
             if (Math.random() < 0.05) {
+                // 5% cơ hội share bị từ chối
                 this._handleShare(Math.random() > 0.05);
             }
         }, 3000);
     }
 }
 
+// Tạo một instance của WebMiner và gán nó cho window để có thể truy cập từ các file khác
 const webMiner = new WebMiner();
 
-// Các hàm hỗ trợ
-function checkWasmSupport() {
-    try {
-        if (typeof WebAssembly === 'object' && 
-            typeof WebAssembly.instantiate === 'function') {
-            const module = new WebAssembly.Module(new Uint8Array([
-                0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00
-            ]));
-            if (module instanceof WebAssembly.Module) {
-                return new WebAssembly.Instance(module) instanceof WebAssembly.Instance;
-            }
-        }
-    } catch (e) {}
-    return false;
-}
-
-function checkWebWorkersSupport() {
-    return typeof Worker !== 'undefined';
-}
-
-function checkSharedMemorySupport() {
-    try {
-        return typeof SharedArrayBuffer !== 'undefined';
-    } catch (e) {
-        return false;
-    }
-}
-
-function getTotalSystemMemory() {
-    if (navigator.deviceMemory) {
-        return `${navigator.deviceMemory} GB`;
-    }
-    return 'Không xác định';
-}
-
-function getAlgorithmInfo(algorithmId) {
-    const algorithms = {
-        'rx/0': {
-            name: 'RandomX',
-            coin: 'Monero (XMR)',
-            hashrateFactor: 1.0,
-            difficulty: 'High',
-            memoryRequirement: 'High (2GB+)',
-            description: 'RandomX là thuật toán hashing chống ASIC được thiết kế cho Monero'
-        },
-        'cn/r': {
-            name: 'CryptoNight-R',
-            coin: 'Monero (XMR - legacy)',
-            hashrateFactor: 0.5,
-            difficulty: 'Medium',
-            memoryRequirement: 'Medium (1GB+)',
-            description: 'Thuật toán khai thác legacy của Monero'
-        },
-        'cn-lite/1': {
-            name: 'CryptoNight Lite v1',
-            coin: 'Aeon (AEON)',
-            hashrateFactor: 1.8,
-            difficulty: 'Medium',
-            memoryRequirement: 'Low (512MB+)',
-            description: 'Phiên bản nhẹ hơn của CryptoNight'
-        },
-        'cn-pico': {
-            name: 'CryptoNight Pico',
-            coin: 'Turtlecoin (TRTL)',
-            hashrateFactor: 2.5,
-            difficulty: 'Low',
-            memoryRequirement: 'Very Low (256MB+)',
-            description: 'Thuật toán siêu nhẹ dành cho thiết bị có ít RAM'
-        },
-        'rx/wow': {
-            name: 'RandomWOW',
-            coin: 'Wownero (WOW)',
-            hashrateFactor: 1.1,
-            difficulty: 'Medium-High',
-            memoryRequirement: 'Medium (1GB+)',
-            description: 'Biến thể của RandomX cho Wownero'
-        },
-        'argon2/chukwa': {
-            name: 'Chukwa',
-            coin: 'Turtlecoin (TRTL)',
-            hashrateFactor: 1.5,
-            difficulty: 'Medium',
-            memoryRequirement: 'Medium (1GB+)',
-            description: 'Thuật toán mới của Turtlecoin dựa trên Argon2'
-        }
-    };
-    
-    return algorithms[algorithmId] || {
-        name: 'Unknown',
-        coin: 'Unknown',
-        hashrateFactor: 1.0,
-        difficulty: 'Unknown',
-        memoryRequirement: 'Unknown',
-        description: 'Không có thông tin'
-    };
-}
-
-function recommendThreads(algorithmId) {
-    const algorithm = getAlgorithmInfo(algorithmId);
-    const cores = navigator.hardwareConcurrency || 4;
-    
-    // Tùy chỉnh số thread theo thuật toán
-    let recommendedThreads = Math.max(1, Math.floor(cores / 2));
-    
-    // Các thuật toán nặng giảm số thread
-    if (algorithmId === 'rx/0') {
-        recommendedThreads = Math.max(1, Math.floor(cores / 3));
-    }
-    
-    // Các thuật toán nhẹ tăng số thread
-    if (algorithmId === 'cn-pico' || algorithmId === 'cn-lite/1') {
-        recommendedThreads = Math.max(1, Math.ceil(cores * 0.75));
-    }
-    
-    // Thiết bị ít lõi, chỉ sử dụng 1 thread
-    if (cores <= 2) {
-        recommendedThreads = 1;
-    }
-    
-    return recommendedThreads;
-}
-
-function getOptimizedConfig(algorithmId, threadCount, throttle) {
-    const algorithm = getAlgorithmInfo(algorithmId);
-    
-    // Các thông số tối ưu cho mỗi thuật toán
-    const configs = {
-        'rx/0': {
-            hardwareAES: true,
-            initThreads: 1,
-            memory: 2097152, // 2GB
-            astrobwtMaxSize: 550,
-            astrobwtAvgSize: 500
-        },
-        'cn/r': {
-            hardwareAES: true,
-            memory: 1048576, // 1GB
-        },
-        'cn-lite/1': {
-            hardwareAES: true,
-            memory: 524288, // 512MB
-        },
-        'cn-pico': {
-            hardwareAES: true,
-            memory: 262144, // 256MB
-        }
-    };
-    
-    return configs[algorithmId] || {};
-}
-
-function getMiningPoolInfo(poolUrl) {
-    const pools = {
-        'pool.supportxmr.com': {
-            name: 'SupportXMR',
-            fee: 0.6,
-            minPayout: 0.01,
-            regions: ['EU', 'US'],
-            type: 'PPLNS'
-        },
-        'xmr.2miners.com': {
-            name: '2Miners',
-            fee: 1.0,
-            minPayout: 0.1,
-            regions: ['EU', 'US', 'ASIA'],
-            type: 'PPLNS'
-        },
-        'xmrpool.eu': {
-            name: 'XMRPool.eu',
-            fee: 1.0,
-            minPayout: 0.1,
-            regions: ['EU'],
-            type: 'PPLNS'
-        },
-        'hashvault.pro': {
-            name: 'HashVault',
-            fee: 1.0,
-            minPayout: 0.1,
-            regions: ['EU', 'US', 'ASIA', 'AUS'],
-            type: 'PPLNS'
-        },
-        'xmr.nanopool.org': {
-            name: 'Nanopool',
-            fee: 1.0,
-            minPayout: 0.1,
-            regions: ['EU', 'US', 'ASIA', 'AUS'],
-            type: 'PPLNS'
-        },
-        'minexmr.com': {
-            name: 'MineXMR',
-            fee: 1.0,
-            minPayout: 0.004,
-            regions: ['EU', 'US', 'ASIA', 'AUS'],
-            type: 'PPLNS'
-        }
-    };
-    
-    // Kiểm tra xem pool có trong danh sách không
-    for (const key in pools) {
-        if (poolUrl.includes(key)) {
-            return pools[key];
-        }
-    }
-    
-    return null;
-}
-
-// Đăng ký sự kiện
-document.addEventListener('DOMContentLoaded', () => {
-    // Các nút điều khiển
-    document.getElementById('start-button').addEventListener('click', () => {
-        const config = {
-            pool: `${document.getElementById('pool-url').value}:${document.getElementById('pool-port').value}`,
-            wallet: document.getElementById('wallet-address').value,
-            worker: document.getElementById('worker-name').value || 'web-worker',
-            password: document.getElementById('pool-password').value || 'x',
-            threads: parseInt(document.getElementById('threads').value),
-            throttle: parseInt(document.getElementById('throttle-slider').value),
-            algorithm: document.getElementById('algorithm') ? 
-                document.getElementById('algorithm').value : 'rx/0'
-        };
-        
-        webMiner.start(config);
-    });
-    
-    document.getElementById('stop-button').addEventListener('click', () => {
-        webMiner.stop();
-    });
-    
-    // Cập nhật số luồng khi thay đổi
-    document.getElementById('threads-slider').addEventListener('change', () => {
-        const newThreadCount = parseInt(document.getElementById('threads-slider').value);
-        webMiner.updateThreads(newThreadCount);
-    });
-    
-    // Cập nhật cường độ khi thay đổi
-    document.getElementById('throttle-slider').addEventListener('change', () => {
-        const newThrottle = parseInt(document.getElementById('throttle-slider').value);
-        webMiner.updateThrottle(newThrottle);
-    });
-    
-    // Xóa nhật ký
-    const clearLogBtn = document.getElementById('clear-log');
-    if (clearLogBtn) {
-        clearLogBtn.addEventListener('click', () => {
-            webMiner.clearLog();
-        });
-    }
-});
-
-// Cập nhật trạng thái theo chu kỳ
-setInterval(() => {
-    if (webMiner.running) {
-        const stats = webMiner.getStats();
-        
-        if (window.updateDashboard) {
-            window.updateDashboard(stats);
-        }
-    }
-}, 1000);
+// Trong môi trường thực, chúng ta sẽ xuất nó một cách khác, nhưng trong trình duyệt:
+window.webMiner = webMiner;
