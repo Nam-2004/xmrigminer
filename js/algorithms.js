@@ -43,7 +43,7 @@ const ALGORITHMS = {
     },
     "cn/r": {
         name: "CryptoNight-R",
-        coin: "Various CN coins",
+        coin: "Các loại coin CN",
         description: "Thuật toán CryptoNight với các thay đổi ngẫu nhiên",
         memory: "2GB",
         hashrateFactor: 0.5,
@@ -65,28 +65,26 @@ const ALGORITHMS = {
             "argon2-impl": "SSE2"
         }
     },
-    "kawpow": {
-        name: "KawPow",
-        coin: "Ravencoin (RVN)",
-        description: "Biến thể của ProgPow, kháng ASIC",
-        memory: "3GB",
-        hashrateFactor: 0.2,
-        difficulty: "Very High",
+    "cn-lite/1": {
+        name: "CryptoNight Lite v1",
+        coin: "Aeon (AEON)",
+        description: "Phiên bản nhẹ của CryptoNight, yêu cầu ít bộ nhớ hơn",
+        memory: "1GB",
+        hashrateFactor: 1.5,
+        difficulty: "Low",
         config: {
-            algo: "kawpow",
-            "kawpow/period": 3
+            algo: "cn-lite/1"
         }
     },
-    "ethash": {
-        name: "Ethash",
-        coin: "Ethereum Classic (ETC)",
-        description: "Thuật toán của Ethereum, yêu cầu nhiều bộ nhớ",
-        memory: "4GB+",
-        hashrateFactor: 0.15,
-        difficulty: "Extremely High",
+    "cn-pico": {
+        name: "CryptoNight Pico",
+        coin: "Turtlecoin (TRTL)",
+        description: "Phiên bản siêu nhẹ của CryptoNight",
+        memory: "256MB",
+        hashrateFactor: 2.0,
+        difficulty: "Low",
         config: {
-            algo: "ethash",
-            "ethash/epoch": 0
+            algo: "cn-pico"
         }
     }
 };
@@ -167,15 +165,16 @@ const MINING_POOLS = [
         website: "https://nanopool.org"
     },
     {
-        name: "F2Pool",
-        url: "xmr.f2pool.com",
+        name: "HashVault",
+        url: "pool.hashvault.pro",
         ports: [
-            { port: 13531, description: "Tiêu chuẩn" },
-            { port: 13532, description: "NiceHash" }
+            { port: 3333, description: "Tiêu chuẩn" },
+            { port: 8888, description: "Độ khó cao" },
+            { port: 8889, description: "SSL" }
         ],
         minPayout: 0.1,
         fee: 1.0,
-        website: "https://f2pool.com"
+        website: "https://hashvault.pro"
     }
 ];
 
@@ -309,8 +308,13 @@ function recommendThreads(algorithmId) {
         return Math.max(1, Math.floor(cores * 0.75));
     }
     
-    // Các thuật toán khác có thể sử dụng nhiều luồng hơn
-    return Math.max(1, Math.floor(cores * 0.85));
+    // Thuật toán CryptoNight Lite/Pico có thể sử dụng nhiều luồng hơn
+    if (algorithmId.startsWith('cn-lite/') || algorithmId.startsWith('cn-pico')) {
+        return Math.max(1, Math.floor(cores * 0.9));
+    }
+    
+    // Các thuật toán khác
+    return Math.max(1, Math.floor(cores * 0.8));
 }
 
 /**
@@ -352,7 +356,11 @@ if (typeof module !== 'undefined' && module.exports) {
         MINER_INFO,
         getAlgorithmInfo, 
         checkWasmSupport,
-        recommendThreads
+        recommendThreads,
+        getOptimizedConfig,
+        getMiningPoolInfo,
+        getTotalSystemMemory,
+        checkWebWorkersSupport,
+        checkSharedMemorySupport
     };
-                }
-                
+}
