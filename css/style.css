@@ -146,10 +146,96 @@ header h1 i {
     margin-right: 8px;
 }
 
-.card h4 {
-    color: var(--text-color);
-    font-size: 1rem;
-    margin-bottom: 8px;
+/* Command Input */
+.command-input {
+    width: 100%;
+    height: 100px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    resize: vertical;
+    margin-bottom: 15px;
+}
+
+.command-input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+}
+
+.command-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Parsed Info */
+.parsed-info {
+    background-color: var(--light-color);
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 20px;
+}
+
+.parsed-info.hidden {
+    display: none;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.info-value {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* Saved Commands */
+.saved-commands {
+    margin-top: 20px;
+}
+
+.saved-commands-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.saved-command-item {
+    background-color: var(--light-color);
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.saved-command-item:hover {
+    background-color: #e2e6ea;
+}
+
+.saved-command-item i {
+    margin-right: 5px;
+    color: var(--secondary-color);
 }
 
 /* Form Elements */
@@ -162,27 +248,6 @@ label {
     margin-bottom: 5px;
     font-weight: 500;
     color: var(--text-color);
-}
-
-input[type="text"],
-input[type="number"],
-input[type="password"],
-select {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-size: 1rem;
-    transition: border-color 0.3s;
-}
-
-input[type="text"]:focus,
-input[type="number"]:focus,
-input[type="password"]:focus,
-select:focus {
-    border-color: var(--primary-color);
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
 }
 
 .thread-selector,
@@ -199,6 +264,9 @@ input[type="range"] {
 input[type="number"] {
     width: 60px;
     text-align: center;
+    padding: 5px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
 }
 
 #throttle-value {
@@ -263,15 +331,6 @@ input[type="number"] {
     background-color: #13506f;
 }
 
-.btn-warning {
-    background-color: var(--warning-color);
-    color: #212529;
-}
-
-.btn-warning:hover {
-    background-color: #e0a800;
-}
-
 .btn-text {
     background: none;
     color: var(--primary-color);
@@ -284,78 +343,13 @@ input[type="number"] {
     text-decoration: underline;
 }
 
-.pool-actions {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
+/* Stats Styles */
 .mining-controls {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
-    }
-/* Config Sections */
-.config-section {
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
 }
 
-.config-section:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-}
-
-.saved-pools {
-    margin-top: 15px;
-}
-
-.saved-pools-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-}
-
-.saved-pool-item {
-    background-color: var(--light-color);
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    display: flex;
-    align-items: center;
-}
-
-.saved-pool-item:hover {
-    background-color: #e2e6ea;
-}
-
-.saved-pool-item i {
-    margin-right: 5px;
-    color: var(--secondary-color);
-}
-
-.cpu-info {
-    background-color: var(--light-color);
-    padding: 12px;
-    border-radius: 6px;
-    margin-bottom: 15px;
-}
-
-.detection-result {
-    margin-bottom: 6px;
-    font-size: 0.95rem;
-}
-
-.detection-result:last-child {
-    margin-bottom: 0;
-}
-
-/* Stats Styles */
 .stats-container {
     margin-bottom: 20px;
 }
@@ -389,55 +383,12 @@ input[type="number"] {
     color: var(--primary-color);
 }
 
-/* Thread Performance */
-.threads-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: 12px;
-    margin-top: 10px;
-}
-
-.thread-item {
+/* CPU Info */
+.cpu-info {
     background-color: var(--light-color);
-    padding: 12px;
+    padding: 15px;
     border-radius: 6px;
-}
-
-.thread-number {
-    font-weight: 500;
-    margin-bottom: 6px;
-}
-
-.thread-hashrate {
-    font-weight: 600;
-    color: var(--primary-color);
-    margin-bottom: 6px;
-}
-
-.thread-usage {
-    height: 8px;
-    background-color: #e2e6ea;
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.thread-usage-bar {
-    height: 100%;
-    background-color: var(--success-color);
-    border-radius: 4px;
-    width: 0%;
-    transition: width 0.5s ease-in-out;
-}
-
-/* Hashrate Chart */
-.hashrate-chart {
-    margin-top: 20px;
-    height: 200px;
-}
-
-canvas {
-    width: 100% !important;
-    height: 100% !important;
+    margin-bottom: 20px;
 }
 
 /* Log Styles */
@@ -447,7 +398,10 @@ canvas {
     flex-direction: column;
 }
 
-.logs-card h2 {
+.logs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 10px;
 }
 
@@ -486,12 +440,13 @@ canvas {
 /* Footer */
 footer {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     padding-top: 20px;
     border-top: 1px solid var(--border-color);
     font-size: 0.9rem;
     color: var(--text-muted);
+    text-align: center;
 }
 
 footer a {
@@ -501,18 +456,6 @@ footer a {
 
 footer a:hover {
     text-decoration: underline;
-}
-
-/* Advanced Options */
-.advanced-panel {
-    background-color: var(--light-color);
-    padding: 15px;
-    border-radius: 6px;
-    margin-top: 10px;
-}
-
-.advanced-panel.hidden {
-    display: none;
 }
 
 /* Modal Styles */
@@ -567,63 +510,6 @@ footer a:hover {
     color: var(--primary-color);
 }
 
-/* Pool List in Modal */
-.pool-list-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.pool-list-item:last-child {
-    border-bottom: none;
-}
-
-.pool-list-item-info {
-    flex: 1;
-}
-
-.pool-list-item-name {
-    font-weight: 500;
-    margin-bottom: 4px;
-}
-
-.pool-list-item-url {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-.pool-list-item-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.load-btn, .delete-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.load-btn:hover {
-    background-color: rgba(40, 167, 69, 0.1);
-    color: var(--success-color);
-}
-
-.delete-btn:hover {
-    background-color: rgba(220, 53, 69, 0.1);
-    color: var(--danger-color);
-}
-
-.pool-list-empty {
-    padding: 20px;
-    text-align: center;
-    color: var(--text-muted);
-}
-
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .stat-row {
@@ -639,7 +525,7 @@ footer a:hover {
         margin-bottom: 0;
     }
     
-    .pool-actions {
+    .command-actions {
         flex-direction: column;
     }
     
@@ -651,63 +537,9 @@ footer a:hover {
         width: 100%;
     }
     
-    footer {
-        flex-direction: column;
-        text-align: center;
-        gap: 10px;
-    }
-    
     .modal-content {
         margin: 20% auto;
         width: 90%;
-    }
-}
-
-/* Utility Classes */
-.text-success {
-    color: var(--success-color);
-}
-
-.text-danger {
-    color: var(--danger-color);
-}
-
-.text-warning {
-    color: var(--warning-color);
-}
-
-.text-muted {
-    color: var(--text-muted);
-}
-
-/* Mobile-specific adjustments */
-@media (max-width: 576px) {
-    .container {
-        padding: 10px;
-    }
-    
-    .threads-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .card {
-        padding: 15px;
-    }
-    
-    .thread-selector,
-    .throttle-selector {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    input[type="range"] {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-    
-    .detection-result {
-        flex-direction: column;
-        margin-bottom: 10px;
     }
 }
 
@@ -729,48 +561,16 @@ footer a:hover {
         border: 1px solid #444444;
     }
     
-    input[type="text"],
-    input[type="number"],
-    input[type="password"],
-    select {
+    .command-input {
         background-color: #333333;
         color: var(--text-color);
         border-color: #444444;
     }
     
-    input[type="text"]:focus,
-    input[type="number"]:focus,
-    input[type="password"]:focus,
-    select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 2px rgba(109, 152, 209, 0.3);
+    input[type="number"] {
+        background-color: #333333;
+        color: var(--text-color);
+        border-color: #444444;
     }
-    
-    .thread-usage {
-        background-color: #444444;
     }
-}
-
-/* Print styles */
-@media print {
-    .mining-controls,
-    .logs-card,
-    .advanced-panel,
-    .modal {
-        display: none !important;
-    }
-    
-    .container {
-        padding: 0;
-    }
-    
-    .card {
-        box-shadow: none;
-        border: 1px solid #ddd;
-        page-break-inside: avoid;
-    }
-    
-    footer {
-        margin-top: 30px;
-    }
-}
+        
