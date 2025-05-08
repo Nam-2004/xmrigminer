@@ -1,142 +1,178 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XMR Web Miner</title>
-    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-microchip"></i> XMR Web Miner</h1>
-            <p class="subtitle">Khai thác XMR trực tuyến với nhiều thuật toán</p>
-        </header>
-
-        <main>
-            <div class="card settings-card">
-                <div class="card-header">
-                    <h2><i class="fas fa-cogs"></i> Cài đặt</h2>
+    <div class="main-content">
+        <div class="card config-card">
+            <h2><i class="fas fa-cogs"></i> Cấu Hình</h2>
+            
+            <!-- Pool Configuration Section -->
+            <div class="config-section">
+                <h3><i class="fas fa-server"></i> Cấu Hình Pool</h3>
+                <div class="form-group">
+                    <label for="pool-url">URL Pool:</label>
+                    <input type="text" id="pool-url" placeholder="ví dụ: xmr.pool.com" value="pool.supportxmr.com">
                 </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label for="wallet-address">Địa chỉ ví XMR:</label>
-                        <input type="text" id="wallet-address" placeholder="Nhập địa chỉ ví Monero của bạn">
+                <div class="form-group">
+                    <label for="pool-port">Port:</label>
+                    <input type="number" id="pool-port" placeholder="ví dụ: 3333" value="3333">
+                </div>
+                <div class="form-group">
+                    <label for="wallet-address">Địa Chỉ Ví:</label>
+                    <input type="text" id="wallet-address" placeholder="Nhập địa chỉ ví Monero của bạn">
+                </div>
+                <div class="form-group">
+                    <label for="worker-name">Tên Máy (tùy chọn):</label>
+                    <input type="text" id="worker-name" placeholder="ví dụ: worker1">
+                </div>
+                <div class="form-group">
+                    <label for="pool-password">Mật Khẩu (nếu cần):</label>
+                    <input type="password" id="pool-password" placeholder="Mật khẩu pool nếu cần">
+                </div>
+                <div class="pool-actions">
+                    <button id="check-pool" class="btn btn-secondary"><i class="fas fa-link"></i> Kiểm Tra Kết Nối</button>
+                    <button id="save-pool" class="btn btn-secondary"><i class="fas fa-save"></i> Lưu Cấu Hình</button>
+                </div>
+                <div class="saved-pools" id="saved-pools">
+                    <h4>Cấu Hình Đã Lưu:</h4>
+                    <div class="saved-pools-list" id="saved-pools-list">
+                        <!-- JS sẽ tạo danh sách cấu hình đã lưu ở đây -->
                     </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="mining-pool">Pool khai thác:</label>
-                            <select id="mining-pool">
-                                <option value="rx.unmineable.com:3333">rx.unmineable.com:3333</option>
-                                <option value="pool.supportxmr.com:3333">pool.supportxmr.com:3333</option>
-                                <option value="xmr.2miners.com:2222">xmr.2miners.com:2222</option>
-                                <option value="xmr.f2pool.com:13531">xmr.f2pool.com:13531</option>
-                                <option value="xmrpool.eu:3333">xmrpool.eu:3333</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="worker-name">Tên worker:</label>
-                            <input type="text" id="worker-name" placeholder="worker1" value="web-worker">
-                        </div>
+                </div>
+            </div>
+
+            <!-- CPU Configuration Section -->
+            <div class="config-section">
+                <h3><i class="fas fa-microchip"></i> Cấu Hình CPU</h3>
+                <div class="cpu-info" id="cpu-info">
+                    <div class="detection-result">
+                        <span>CPU của bạn: </span>
+                        <span id="cpu-model">Đang phát hiện...</span>
                     </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="algorithm">Thuật toán:</label>
-                            <select id="algorithm">
-                                <option value="rx/0">RandomX (rx/0) - Monero</option>
-                                <option value="rx/wow">RandomWow (rx/wow) - Wownero</option>
-                                <option value="rx/arq">RandomArq (rx/arq) - ArQmA</option>
-                                <option value="cn/r">CryptoNight-R (cn/r)</option>
-                                <option value="argon2/chukwa">Argon2/Chukwa - Turtlecoin</option>
-                                <option value="kawpow">KawPow - Ravencoin</option>
-                                <option value="ethash">Ethash</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="threads">Số luồng CPU:</label>
-                            <input type="number" id="threads" min="1" max="16" value="4">
-                        </div>
+                    <div class="detection-result">
+                        <span>Số luồng tối đa: </span>
+                        <span id="max-threads">Đang phát hiện...</span>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="throttle">Mức sử dụng CPU:</label>
-                        <input type="range" id="throttle" min="1" max="100" value="70">
+                    <div class="detection-result">
+                        <span>Số luồng đề xuất: </span>
+                        <span id="recommended-threads">Đang phát hiện...</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="threads">Số Luồng:</label>
+                    <div class="thread-selector">
+                        <input type="range" id="threads-slider" min="1" max="12" value="2">
+                        <input type="number" id="threads" min="1" max="12" value="2">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="throttle">Cường Độ:</label>
+                    <div class="throttle-selector">
+                        <input type="range" id="throttle-slider" min="0" max="100" value="70">
                         <span id="throttle-value">70%</span>
                     </div>
                 </div>
+                <button id="auto-config" class="btn btn-secondary"><i class="fas fa-magic"></i> Tự Động Cấu Hình</button>
             </div>
+        </div>
 
-            <div class="card status-card">
-                <div class="card-header">
-                    <h2><i class="fas fa-chart-line"></i> Thống kê</h2>
+        <div class="card mining-card">
+            <h2><i class="fas fa-chart-line"></i> Điều Khiển & Thống Kê</h2>
+            <div class="mining-controls">
+                <button id="start-button" class="btn btn-success"><i class="fas fa-play"></i> Bắt Đầu</button>
+                <button id="stop-button" class="btn btn-danger" disabled><i class="fas fa-stop"></i> Dừng</button>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-row">
+                    <div class="stat-item">
+                        <div class="stat-label">Tốc Độ Hash:</div>
+                        <div class="stat-value" id="hashrate">0 H/s</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Tổng Hash:</div>
+                        <div class="stat-value" id="total-hashes">0</div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <div class="stat-label">Trạng thái:</div>
-                            <div class="stat-value" id="mining-status">Dừng</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-label">Hashrate:</div>
-                            <div class="stat-value" id="hashrate">0 H/s</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-label">Shares đã chấp nhận:</div>
-                            <div class="stat-value" id="accepted-shares">0</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-label">Shares bị từ chối:</div>
-                            <div class="stat-value" id="rejected-shares">0</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-label">Kết nối:</div>
-                            <div class="stat-value" id="connection-status">Không kết nối</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-label">Thời gian chạy:</div>
-                            <div class="stat-value" id="uptime">00:00:00</div>
-                        </div>
+                <div class="stat-row">
+                    <div class="stat-item">
+                        <div class="stat-label">Kết Nối:</div>
+                        <div class="stat-value" id="connection-status">Chưa kết nối</div>
                     </div>
-                    
-                    <div class="hashrate-chart-container">
-                        <canvas id="hashrate-chart"></canvas>
-                    </div>
-                    
-                    <div class="button-group">
-                        <button id="start-button" class="btn primary-btn"><i class="fas fa-play"></i> Bắt đầu khai thác</button>
-                        <button id="stop-button" class="btn danger-btn" disabled><i class="fas fa-stop"></i> Dừng khai thác</button>
+                    <div class="stat-item">
+                        <div class="stat-label">Thời Gian Chạy:</div>
+                        <div class="stat-value" id="runtime">00:00:00</div>
                     </div>
                 </div>
             </div>
 
-            <div class="card log-card">
-                <div class="card-header">
-                    <h2><i class="fas fa-terminal"></i> Nhật ký</h2>
-                    <button id="clear-log" class="btn small-btn">Xóa nhật ký</button>
-                </div>
-                <div class="card-body">
-                    <div id="mining-log" class="log-container"></div>
+            <div class="threads-performance">
+                <h3>Hiệu Suất Theo Luồng</h3>
+                <div id="threads-container" class="threads-container">
+                    <!-- JS sẽ tạo phần tử cho mỗi luồng ở đây -->
                 </div>
             </div>
-        </main>
 
-        <footer>
-            <p>© 2023 XMR Web Miner | <a href="https://github.com/xmrig/xmrig" target="_blank">Dựa trên XMRig</a></p>
-            <div class="disclaimer">
-                <strong>Lưu ý:</strong> Miner này sẽ sử dụng CPU của bạn để khai thác tiền điện tử. Vui lòng sử dụng có trách nhiệm.
+            <div class="hashrate-chart">
+                <h3>Biểu Đồ Hiệu Suất</h3>
+                <canvas id="hashrate-chart"></canvas>
             </div>
-        </footer>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/algorithms.js"></script>
-    <script src="js/miner.js"></script>
-    <script src="js/app.js"></script>
-</body>
-</html>
+    <div class="card logs-card">
+        <h2><i class="fas fa-terminal"></i> Nhật Ký Hoạt Động</h2>
+        <div class="log-container" id="logs">
+            <div class="log-entry">Khởi động hệ thống...</div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="advanced-options">
+            <button id="toggle-advanced" class="btn btn-text"><i class="fas fa-sliders-h"></i> Tùy Chọn Nâng Cao</button>
+            <div id="advanced-panel" class="advanced-panel hidden">
+                <div class="form-group">
+                    <label for="custom-diff">Độ Khó Tùy Chỉnh:</label>
+                    <input type="number" id="custom-diff" value="0" placeholder="0 = tự động">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="background-mining"> Cho phép khai thác nền
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="notify-success"> Thông báo khi tìm thấy share
+                    </label>
+                </div>
+                <button id="clear-data" class="btn btn-warning"><i class="fas fa-trash"></i> Xóa Dữ Liệu Đã Lưu</button>
+            </div>
+        </div>
+        <p><i class="fas fa-code"></i> XMR Web Miner v1.2.0 | <a href="#" id="about-link">Thông Tin</a></p>
+    </footer>
+</div>
+
+<!-- About Modal -->
+<div id="about-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Về XMR Web Miner</h2>
+        <p>XMR Web Miner là một trình khai thác Monero (XMR) trên trình duyệt sử dụng WebAssembly để tối ưu hiệu suất.</p>
+        <p>Phiên bản: 1.2.0</p>
+        <h3>Lưu ý quan trọng:</h3>
+        <p>- Chỉ sử dụng khi bạn có quyền với thiết bị và mạng</p>
+        <p>- Khai thác tiền điện tử có thể làm tăng nhiệt độ thiết bị và tiêu thụ pin</p>
+    </div>
+</div>
+
+<!-- Pool Selection Modal -->
+<div id="pool-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Chọn Pool Đã Lưu</h2>
+        <div id="pool-list">
+            <!-- JS sẽ tạo danh sách pool ở đây -->
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.7.0/chart.min.js"></script>
+<script src="js/algorithms.js"></script> 
+<script src="js/miner.js"></script>
+<script src="js/app.js"></script>
